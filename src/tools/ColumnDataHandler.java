@@ -2,7 +2,15 @@ package tools;
 
 import java.util.Map;
 
-public interface DataConvertor {
+/**
+ * For added new column in dst table. Or sometimes you want convert the old
+ * value to a new value. Or the new column value coming from a calculating
+ * result.
+ * 
+ * @author zhangqunshi@126.com
+ *
+ */
+public interface ColumnDataHandler {
 
 	/**
 	 * Which column value need to convert

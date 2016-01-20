@@ -14,12 +14,12 @@ class Table {
 
 	Connector conn;
 	String name;
-	Map<String, DataConvertor> convertors;
+	Map<String, ColumnDataHandler> handlers;
 
 	public Table(Connector conn, String name) {
 		this.conn = conn;
 		this.name = name;
-		convertors = new HashMap<>();
+		handlers = new HashMap<>();
 	}
 
 	public List<String> getColumns() {
@@ -70,8 +70,8 @@ class Table {
 		return data;
 	}
 
-	public void registerDataConvertor(DataConvertor dc) {
-		convertors.put(dc.getColumnName(), dc);
+	public void registerDataConvertor(ColumnDataHandler handler) {
+		handlers.put(handler.getColumnName(), handler);
 	}
 
 	public void fetchData(Table fromTable) {
@@ -94,9 +94,10 @@ class Table {
 					System.out.println("==> " + psmt);
 					int count = psmt.executeUpdate();
 					if (count <= 0) {
-						System.err.println("Fail to run sql: " + insertSql);
+						System.err.println("Fail to run sql: " + psmt);
 					}
 				} catch (SQLException e) {
+					// ignore the Duplicate entry key 'PRIMARY' error.
 					e.printStackTrace();
 				}
 
@@ -114,9 +115,9 @@ class Table {
 
 			Object value = null;
 
-			if (convertors.containsKey(colname)) {
+			if (handlers.containsKey(colname)) {
 				// the column value need converting
-				DataConvertor dc = convertors.get(colname);
+				ColumnDataHandler dc = handlers.get(colname);
 				// TODO more information needed by converting
 				value = dc.convert(row);
 
