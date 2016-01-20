@@ -83,12 +83,12 @@ class Table {
 
 		Connection dbcon = null;
 		try {
+
+			dbcon = this.conn.getConnection();
+			PreparedStatement psmt = dbcon.prepareStatement(insertSql);
+
 			for (Map<String, Object> row : data) {
-
-				dbcon = this.conn.getConnection();
 				try {
-					PreparedStatement psmt = dbcon.prepareStatement(insertSql);
-
 					populateValue(columns, row, psmt);
 
 					System.out.println("==> " + psmt);
@@ -102,6 +102,8 @@ class Table {
 				}
 
 			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		} finally {
 			this.conn.close(dbcon);
 		}
