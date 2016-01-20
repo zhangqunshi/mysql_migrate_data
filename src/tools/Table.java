@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,5 +66,47 @@ class Table {
 		}
 
 		return data;
+	}
+
+	public void fetchData(Table fromTable) throws SQLException {
+		List<String> columns = getColumns();
+
+		String preSql = "INSERT INTO " + this.name + "(" + columns.get(0);
+		for (int i = 1; i < columns.size(); i++) {
+			preSql += "," + columns.get(i);
+		}
+		preSql += ") VALUES(";
+
+		List<Map<String, Object>> data = fromTable.getData();
+
+		Connection dbcon = null;
+		try {
+			for (Map<String, Object> row : data) {
+
+				StringBuilder sb = new StringBuilder(preSql);
+				for (String colname : columns) {
+					if (row.containsKey(colname)) {
+						Object value = row.get(colname);
+
+						sb.append(value).append(",");
+					} else {
+						// TODO use column plugin to get data
+					}
+				}
+				String insertSql = sb.substring(0, sb.length() - 1) + ")";
+
+				System.out.println("==> " + insertSql);
+
+				dbcon = this.conn.getConnection();
+				PreparedStatement psmt = dbcon.prepareStatement(insertSql);
+				int count = psmt.executeUpdate();
+				if (count <= 0) {
+					System.err.println("Fail to run sql: " + insertSql);
+				}
+
+			}
+		} finally {
+			this.conn.close(dbcon);
+		}
 	}
 }

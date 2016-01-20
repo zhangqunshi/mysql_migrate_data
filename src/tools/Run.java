@@ -1,6 +1,7 @@
 package tools;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -22,22 +23,27 @@ public class Run {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		Connector src = new Connector(src_db_name);
+		Connector dst = new Connector(dst_db_name);
 
-		Schema s = new Schema(src);
-		List<String> tables = s.getTables();
+		// Schema s = new Schema(src);
+		// List<String> tables = s.getTables();
+		//
+		// int idx = 1;
+		//
+		// for (String tableName : tables) {
+		// Table t = new Table(src, tableName);
+		// List<String> cols = t.getColumns();
+		// System.out.println(idx + ": " + tableName + "==>" + cols);
+		// // List<Map<String, Object>> data = t.getData();
+		// // System.out.println("==>" + data);
+		// idx++;
+		// }
 
-		int idx = 1;
-
-		for (String tableName : tables) {
-			Table t = new Table(src, tableName);
-			List<String> cols = t.getColumns();
-			System.out.println(idx + ": " + tableName + "==>" + cols);
-			// List<Map<String, Object>> data = t.getData();
-			// System.out.println("==>" + data);
-			idx++;
-		}
+		Table t1 = new Table(src, "administrator");
+		Table t2 = new Table(dst, "administrator");
+		t2.fetchData(t1);
 
 		System.out.println("END");
 	}
