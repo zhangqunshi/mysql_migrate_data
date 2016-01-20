@@ -23,7 +23,7 @@ public class Run {
 		}
 	}
 
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) {
 		Connector src = new Connector(src_db_name);
 		Connector dst = new Connector(dst_db_name);
 

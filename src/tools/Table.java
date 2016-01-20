@@ -14,10 +14,12 @@ class Table {
 
 	Connector conn;
 	String name;
+	Map<String, DataConvertor> convertors;
 
 	public Table(Connector conn, String name) {
 		this.conn = conn;
 		this.name = name;
+		convertors = new HashMap<>();
 	}
 
 	public List<String> getColumns() {
@@ -68,14 +70,14 @@ class Table {
 		return data;
 	}
 
-	public void fetchData(Table fromTable) throws SQLException {
+	public void registerDataConvertor(DataConvertor dc) {
+		convertors.put(dc.getColumnName(), dc);
+	}
+
+	public void fetchData(Table fromTable) {
 		List<String> columns = getColumns();
 
-		String preSql = "INSERT INTO " + this.name + "(" + columns.get(0);
-		for (int i = 1; i < columns.size(); i++) {
-			preSql += "," + columns.get(i);
-		}
-		preSql += ") VALUES(";
+		String insertSql = buildInsertSql(columns);
 
 		List<Map<String, Object>> data = fromTable.getData();
 
@@ -83,30 +85,63 @@ class Table {
 		try {
 			for (Map<String, Object> row : data) {
 
-				StringBuilder sb = new StringBuilder(preSql);
-				for (String colname : columns) {
-					if (row.containsKey(colname)) {
-						Object value = row.get(colname);
-
-						sb.append(value).append(",");
-					} else {
-						// TODO use column plugin to get data
-					}
-				}
-				String insertSql = sb.substring(0, sb.length() - 1) + ")";
-
-				System.out.println("==> " + insertSql);
-
 				dbcon = this.conn.getConnection();
-				PreparedStatement psmt = dbcon.prepareStatement(insertSql);
-				int count = psmt.executeUpdate();
-				if (count <= 0) {
-					System.err.println("Fail to run sql: " + insertSql);
+				try {
+					PreparedStatement psmt = dbcon.prepareStatement(insertSql);
+
+					populateValue(columns, row, psmt);
+
+					System.out.println("==> " + psmt);
+					int count = psmt.executeUpdate();
+					if (count <= 0) {
+						System.err.println("Fail to run sql: " + insertSql);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
 
 			}
 		} finally {
 			this.conn.close(dbcon);
 		}
+	}
+
+	private void populateValue(List<String> columns, Map<String, Object> row,
+			PreparedStatement psmt) throws SQLException {
+		int idx = 1;
+		for (String colname : columns) {
+			// handling base on dst table columns
+
+			Object value = null;
+
+			if (convertors.containsKey(colname)) {
+				// the column value need converting
+				DataConvertor dc = convertors.get(colname);
+				// TODO more information needed by converting
+				value = dc.convert(row);
+
+			} else if (row.containsKey(colname)) {
+				// src column and dst column both exist
+				value = row.get(colname);
+
+			} else {
+				System.err.println("Don't know how to give value to column "
+						+ colname);
+			}
+
+			psmt.setObject(idx, value);
+			idx++;
+		}
+	}
+
+	private String buildInsertSql(List<String> columns) {
+		String preSql = "INSERT INTO " + this.name + "(" + columns.get(0);
+		String param = "?";
+		for (int i = 1; i < columns.size(); i++) {
+			preSql += "," + columns.get(i);
+			param += ",?";
+		}
+		preSql += ") VALUES(" + param + ")";
+		return preSql;
 	}
 }
