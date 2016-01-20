@@ -8,19 +8,23 @@ public class Run {
 		Connector src = new Connector(Config.src_db_name);
 		Connector dst = new Connector(Config.dst_db_name);
 
-		Schema s = new Schema(dst);
-		List<String> tables = s.getTables();
+		Schema srcdb = new Schema(src);
+		Schema dstdb = new Schema(dst);
+		List<String> srcTables = srcdb.getTables();
+		List<String> dstTables = dstdb.getTables();
 
 		int idx = 1;
 
-		for (String tableName : tables) {
+		for (String tableName : dstTables) {
 			if (Config.ignore_tables.contains(tableName)) {
 				continue;
 			}
 
-			Table t = new Table(src, tableName);
-			List<String> cols = t.getColumns();
-			System.out.println(idx + ": " + tableName + "==>" + cols);
+			if (!srcTables.contains(tableName)) {
+				continue;
+			}
+
+			System.out.println(idx + ": " + tableName);
 
 			Table t1 = new Table(src, tableName);
 			Table t2 = new Table(dst, tableName);
