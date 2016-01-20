@@ -2,37 +2,44 @@ package tools;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class Run {
 
-	static String srcdb_url;
-	static String dstdb_url;
+	static String src_db_name;
+	static String dst_db_name;
 
 	static {
 		Properties p = new Properties();
 		try {
 			InputStream in = Object.class.getResourceAsStream("/db.conf");
 			p.load(in);
-			srcdb_url = p.getProperty("srcdb_url");
-			dstdb_url = p.getProperty("dstdb_url");
+			src_db_name = p.getProperty("src_db_name");
+			dst_db_name = p.getProperty("dst_db_name");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main(String[] args) {
-		Connector c = new Connector(srcdb_url);
+		Connector src = new Connector(src_db_name);
 
-		// Table t = new Table(c, "desktop");
-		// List cols = t.getColumns();
-		// System.out.println("==>" + cols);
-		// List data = t.getData();
-		// System.out.println("==>" + data);
+		Schema s = new Schema(src);
+		List<String> tables = s.getTables();
 
-		Schema s = new Schema(c, "test1");
-		List tables = s.getTables();
-		System.out.println("==>" + tables);
+		int idx = 1;
+
+		for (String tableName : tables) {
+			Table t = new Table(src, tableName);
+			List<String> cols = t.getColumns();
+			System.out.println(idx + ": " + tableName + "==>" + cols);
+			// List<Map<String, Object>> data = t.getData();
+			// System.out.println("==>" + data);
+			idx++;
+		}
+
+		System.out.println("END");
 	}
 
 }

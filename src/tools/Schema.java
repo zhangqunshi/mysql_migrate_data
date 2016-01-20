@@ -9,11 +9,9 @@ import java.util.List;
 public class Schema {
 
 	Connector conn;
-	String name;
 
-	public Schema(Connector conn, String name) {
+	public Schema(Connector conn) {
 		this.conn = conn;
-		this.name = name;
 	}
 
 	public List<String> getTables() {
@@ -22,7 +20,7 @@ public class Schema {
 		try {
 			dbcon = this.conn.getConnection();
 			DatabaseMetaData dbmd = dbcon.getMetaData();
-			ResultSet rs = dbmd.getTables(null, this.name, "%", null);
+			ResultSet rs = dbmd.getTables(null, conn.dbName, "%", null);
 
 			while (rs.next()) {
 				String colname = rs.getString("TABLE_NAME");
