@@ -20,7 +20,8 @@ public class Schema {
 		try {
 			dbcon = this.conn.getConnection();
 			DatabaseMetaData dbmd = dbcon.getMetaData();
-			ResultSet rs = dbmd.getTables(null, conn.dbName, "%", null);
+			ResultSet rs = dbmd.getTables(null, conn.dbName, "%",
+					new String[] { "TABLE" });
 
 			while (rs.next()) {
 				String colname = rs.getString("TABLE_NAME");
