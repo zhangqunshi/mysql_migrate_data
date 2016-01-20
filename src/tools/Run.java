@@ -24,11 +24,15 @@ public class Run {
 	public static void main(String[] args) {
 		Connector c = new Connector(srcdb_url);
 
-		Table t = new Table(c, "desktop");
-		List cols = t.getColumns();
-		System.out.println("==>" + cols);
-		List data = t.getData();
-		System.out.println("==>" + data);
+		// Table t = new Table(c, "desktop");
+		// List cols = t.getColumns();
+		// System.out.println("==>" + cols);
+		// List data = t.getData();
+		// System.out.println("==>" + data);
+
+		Schema s = new Schema(c, "test1");
+		List tables = s.getTables();
+		System.out.println("==>" + tables);
 	}
 
 }
