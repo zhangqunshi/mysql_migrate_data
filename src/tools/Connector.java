@@ -62,4 +62,8 @@ public class Connector {
 		}
 	}
 
+	public String getDBName() {
+		return dbName;
+	}
+
 }

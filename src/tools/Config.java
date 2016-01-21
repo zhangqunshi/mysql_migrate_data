@@ -11,6 +11,7 @@ public class Config {
 	static String dst_db_name;
 
 	static List<String> ignore_tables = new ArrayList<>();
+	static List<String> include_tables = new ArrayList<>();
 
 	static {
 		Properties p = new Properties();
@@ -20,20 +21,8 @@ public class Config {
 			src_db_name = p.getProperty("src_db_name");
 			dst_db_name = p.getProperty("dst_db_name");
 
-			String ignoreTables = p.getProperty("ignore_tables");
-
-			if (ignoreTables != null && !"".equals(ignoreTables.trim())) {
-
-				String[] ignores = ignoreTables.trim().split(",");
-
-				for (String tableName : ignores) {
-					if ("".equals(tableName.trim())) {
-						continue;
-					}
-					ignore_tables.add(tableName.trim());
-				}
-
-			}
+			setList(p, "ignore_tables", ignore_tables);
+			setList(p, "include_tables", include_tables);
 
 			System.out.println("src db: " + src_db_name);
 			System.out.println("dst db: " + dst_db_name);
@@ -43,6 +32,23 @@ public class Config {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void setList(Properties p, String key, List<String> list) {
+		String values = p.getProperty(key);
+
+		if (values != null && !"".equals(values.trim())) {
+
+			String[] v = values.trim().split(",");
+
+			for (String one : v) {
+				if ("".equals(one.trim())) {
+					continue;
+				}
+				list.add(one.trim());
+			}
+
+		}
 	}
 
 }
