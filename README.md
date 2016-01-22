@@ -6,7 +6,7 @@ $ javac Run.java <br>
 $ java Run <br>
 
 <p>
-I want this tools to keep simple, only depends on mysql-driver by JDBC, no other dependence. You can easy to understand the code, and make your own version base on this.
+I want this tool to keep simple, only depends on mysql-driver by JDBC, no other dependence. You can easy to understand the code, and make your own version base on this.
 Feature: <br>
 <ul>
 <li>Never delete any data, except you call deleteData method.</li>
