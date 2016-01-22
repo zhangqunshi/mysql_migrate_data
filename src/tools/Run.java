@@ -9,6 +9,9 @@ import tools.handler.NullValue;
 public class Run {
 
 	public static void main(String[] args) {
+		System.out.println("---------------------------");
+		System.out.println("    MySQL Migrate Data v0.1");
+		System.out.println("---------------------------");
 		Connector src = new Connector(Config.src_db_name);
 		Connector dst = new Connector(Config.dst_db_name);
 
@@ -39,11 +42,11 @@ public class Run {
 			Table t2 = new Table(dst, tableName);
 
 			if (tableName.equals("t1")) {
-				t2.addColumnHandler("err_msg", new NullValue());
+				t2.addColumnHandler("description", new NullValue());
 			}
 
 			if (tableName.equals("t2")) {
-				t2.addColumnHandler("lastsynctime", new CurrentDate());
+				t2.addColumnHandler("createtime", new CurrentDate());
 			}
 
 			if (tableName.equals("t3")) {
